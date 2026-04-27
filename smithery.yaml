@@ -1,0 +1,122 @@
+# Smithery Registry — hive-mcp-auction
+# https://smithery.ai
+
+startCommand:
+  type: http
+  configSchema:
+    type: object
+    properties: {}
+    required: []
+  url: https://hive-mcp-auction.onrender.com/mcp
+
+name: hive-mcp-auction
+displayName: hive-mcp-auction — Inbound reverse Dutch auction agent
+version: "1.0.0"
+description: >
+  Inbound reverse Dutch auction agent. When a Hive shim hits its rate-limit
+  headroom, the next request gets a 402 with a Dutch descent envelope:
+  starting price 5x standard asking, dropping 5% every 30s until claimed or
+  floor. First agent to settle at the current price wins the slot. MCP
+  2024-11-05, USDC on Base L2, race-safe first-claim-wins. Real rails.
+
+author:
+  name: Steve Rotzin
+  email: steve@thehiveryiq.com
+  url: https://www.thehiveryiq.com
+
+license: MIT
+homepage: https://github.com/srotzin/hive-mcp-auction
+repository:
+  type: git
+  url: https://github.com/srotzin/hive-mcp-auction
+
+transport: streamable-http
+endpoint: https://hive-mcp-auction.onrender.com/mcp
+protocol: "2024-11-05"
+
+categories:
+  - finance
+  - agent-to-agent
+  - auction
+  - web3
+  - defi
+
+tags:
+  - mcp
+  - hive
+  - auction
+  - dutch-auction
+  - x402
+  - 402
+  - rate-limit
+  - ai-agents
+  - a2a
+  - usdc
+  - base-l2
+
+tools:
+  - name: auction_open
+    description: >
+      Open a new Dutch auction for a scarce shim slot. INTERNAL — requires
+      HMAC signature from hivemorph. The MCP tool surface is exposed for
+      discovery only; opens go through POST /v1/auction/open.
+    inputs:
+      - name: shim
+        type: string
+        required: true
+        description: "Origin shim id, e.g. hive-mcp-evaluator"
+      - name: asking_usd
+        type: number
+        required: true
+        description: "Standard 402 asking price in USD"
+      - name: max_descent_pct
+        type: number
+        required: false
+        description: "Caller-bound descent (capped at MAX_DESCENT_PCT=0.50)"
+  - name: auction_subscribe
+    description: >
+      Subscribe to the live descent curve for an open auction. Returns the
+      SSE URL — agents connect with EventSource for real-time price ticks.
+    inputs:
+      - name: auction_id
+        type: string
+        required: true
+        description: "Auction id from /v1/auction/open"
+  - name: auction_book
+    description: >
+      Today aggregate — opens, closes, avg_premium_pct, total_usdc captured.
+      Tier 0, free, read-only.
+    inputs: []
+
+runtime:
+  type: node
+  version: ">=18"
+  command: node server.js
+  env:
+    - name: PORT
+      default: "3000"
+      required: false
+    - name: ENABLE_AUCTION
+      default: "false"
+      required: false
+    - name: WALLET_ADDRESS
+      default: "0x15184bf50b3d3f52b60434f8942b7d52f2eb436e"
+      required: false
+    - name: USDC_BASE
+      default: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      required: false
+    - name: BASE_RPC
+      default: "https://mainnet.base.org"
+      required: false
+    - name: MAX_CONCURRENT_AUCTIONS
+      default: "50"
+      required: false
+    - name: MAX_DESCENT_PCT
+      default: "0.50"
+      required: false
+    - name: MAX_START_MULT
+      default: "10"
+      required: false
+    - name: AUCTION_MAX_DURATION_S
+      default: "840"
+      required: false

@@ -1,0 +1,14 @@
+node_modules/
+npm-debug.log
+.env
+.env.*
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.DS_Store
+.idea/
+.vscode/
+coverage/
+dist/
+.tmp/

@@ -1,0 +1,42 @@
+{
+  "name": "hive-mcp-auction",
+  "version": "1.0.0",
+  "description": "Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05.",
+  "type": "module",
+  "main": "server.js",
+  "bin": {
+    "hive-mcp-auction": "./server.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "mcp",
+    "hive",
+    "auction",
+    "dutch-auction",
+    "x402",
+    "402",
+    "rate-limit",
+    "ai-agents",
+    "a2a",
+    "usdc",
+    "base-l2"
+  ],
+  "author": "Steve Rotzin <steve@thehiveryiq.com> (https://www.thehiveryiq.com)",
+  "license": "MIT",
+  "homepage": "https://github.com/srotzin/hive-mcp-auction",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/srotzin/hive-mcp-auction"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "ethers": "^6.13.2",
+    "express": "^4.19.2"
+  }
+}
