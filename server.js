@@ -433,7 +433,7 @@ setInterval(expireSweep, 60_000);
 // ─── Schema discoverability ────────────────────────────────────────────────
 const AGENT_CARD = {
   name: SERVICE,
-  description: `Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots, first-claim-wins, USDC settlement on Base L2. MCP 2024-11-05.. New agents: first call free. Loyalty: every 6th paid call is free. Pay in USDC on Base L2.`,
+  description: 'Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05.. New agents: first call free. Loyalty: every 6th paid call is free. Pay in USDC on Base L2.',
   url: `https://${SERVICE}.onrender.com`,
   provider: {
     organization: 'Hive Civilization',
@@ -458,7 +458,11 @@ const AGENT_CARD = {
   },
   defaultInputModes: ['application/json'],
   defaultOutputModes: ['application/json'],
-  skills: TOOLS.map(t => ({ name: t.name, description: t.description })),
+  skills: [
+    { name: 'auction_open', description: 'Open a new Dutch auction for a scarce shim slot. INTERNAL — requires HMAC signature from hivemorph rate-limiter. Returns auction id, descent curve, and 402 envelope block.' },
+    { name: 'auction_subscribe', description: 'Subscribe to the live descent curve for an open auction. Returns the SSE URL — agents connect with EventSource for real-time price ticks. Tier 0, free, read-only.' },
+    { name: 'auction_book', description: 'Today aggregate: opens, closes, avg_premium_pct, total_usdc captured. Tier 0, free, read-only.' },
+  ],
   extensions: {
     hive_pricing: {
       currency: 'USDC',
@@ -476,7 +480,7 @@ const AP2 = {
   agent: {
     name: SERVICE,
     did: `did:web:${SERVICE}.onrender.com`,
-    description: `Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots, first-claim-wins, USDC settlement on Base L2. MCP 2024-11-05.. New agents: first call free. Loyalty: every 6th paid call is free. Pay in USDC on Base L2.`,
+    description: 'Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05.. New agents: first call free. Loyalty: every 6th paid call is free. Pay in USDC on Base L2.',
   },
   endpoints: {
     mcp: `https://${SERVICE}.onrender.com/mcp`,
@@ -496,7 +500,7 @@ const AP2 = {
 };
 
 app.get('/.well-known/agent-card.json', (req, res) => res.json(AGENT_CARD));
-app.get('/.well-known/ap2.json', (req, res) => res.json(AP2));
+app.get('/.well-known/ap2.json',         (req, res) => res.json(AP2));
 
 
 app.listen(PORT, () => {
