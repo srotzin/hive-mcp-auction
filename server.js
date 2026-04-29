@@ -548,6 +548,11 @@ setInterval(tickAllOpen, DUTCH.INTERVAL_S * 1000);
 setInterval(expireSweep, 60_000);
 
 
+// ─── Schema constants (auto-injected to fix deploy) ─────
+const SERVICE = 'hive-mcp-auction';
+const VERSION = '1.0.0';
+
+
 // ─── Schema discoverability ────────────────────────────────────────────────
 const AGENT_CARD = {
   name: SERVICE,
