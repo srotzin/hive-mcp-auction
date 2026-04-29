@@ -433,7 +433,7 @@ setInterval(expireSweep, 60_000);
 // ─── Schema discoverability ────────────────────────────────────────────────
 const AGENT_CARD = {
   name: SERVICE,
-  description: 'Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05.. New agents: first call free. Loyalty: every 6th paid call is free. Pay in USDC on Base L2.',
+  description: 'Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05. New agents: first call free. Loyalty: every 6th paid call is free. Pay in USDC on Base L2.',
   url: `https://${SERVICE}.onrender.com`,
   provider: {
     organization: 'Hive Civilization',
@@ -480,7 +480,7 @@ const AP2 = {
   agent: {
     name: SERVICE,
     did: `did:web:${SERVICE}.onrender.com`,
-    description: 'Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05.. New agents: first call free. Loyalty: every 6th paid call is free. Pay in USDC on Base L2.',
+    description: 'Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05. New agents: first call free. Loyalty: every 6th paid call is free. Pay in USDC on Base L2.',
   },
   endpoints: {
     mcp: `https://${SERVICE}.onrender.com/mcp`,
