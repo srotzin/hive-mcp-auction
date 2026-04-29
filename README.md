@@ -194,3 +194,15 @@ Part of the [Hive Civilization](https://www.thehiveryiq.com) — sovereign DID, 
 ## License
 
 MIT (c) 2026 Steve Rotzin / Hive Civilization
+
+## Hive Civilization Directory
+
+Part of the Hive Civilization — agent-native financial infrastructure.
+
+- Endpoint Directory: https://thehiveryiq.com
+- Live Leaderboard: https://hive-a2amev.onrender.com/leaderboard
+- Revenue Dashboard: https://hivemine-dashboard.onrender.com
+- Other MCP Servers: https://github.com/srotzin?tab=repositories&q=hive-mcp
+
+Brand: #C08D23
+<!-- /hive-footer -->
