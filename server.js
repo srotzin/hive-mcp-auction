@@ -164,7 +164,7 @@ const TOOLS = [
   },
   {
     name: 'auction_subscribe',
-    description: 'Subscribe to the live descent curve for an open auction. Returns the SSE URL — agents connect with EventSource for real-time price ticks. Tier 0, free, read-only.',
+    description: 'Subscribe to the live descent curve for an open auction. Returns the SSE URL — agents connect with EventSource for real-time price ticks. x402-gated: $0.10 USDC/session on Base. Supply X-Payment header with USDC transfer tx hash to proceed.',
     inputSchema: {
       type: 'object',
       required: ['auction_id'],
@@ -192,6 +192,10 @@ async function executeTool(name, args) {
       };
     }
     case 'auction_subscribe': {
+      // auction_subscribe is x402-gated — caller must supply X-Payment header
+      // NOTE: this function is only called from the MCP /mcp route, which
+      // passes req into executeTool as a 3rd arg for gate checks.
+      // The gate is enforced in the /mcp tools/call branch below.
       const id = String(args?.auction_id || '');
       if (!id) return { type: 'text', text: JSON.stringify({ error: 'auction_id required' }) };
       return {
@@ -231,6 +235,30 @@ app.post('/mcp', async (req, res) => {
         return res.json({ jsonrpc: '2.0', id, result: { tools: TOOLS } });
       case 'tools/call': {
         const { name, arguments: args } = params || {};
+        // ─── x402 gate for auction_subscribe ─────────────────────────────────
+        // auction_subscribe: $0.10 USDC/session (100000 atomic)
+        // auction_book:      free (read-only aggregate)
+        // auction_open:      HMAC-only internal (handled by REST route)
+        if (name === 'auction_subscribe') {
+          const payHdr = req.headers['x-payment'] || req.headers['x-payment-token'] || null;
+          if (!payHdr) {
+            return res.status(402).json({
+              x402: true,
+              version: '1',
+              tool: 'auction_subscribe',
+              payTo: '0x15184bf50b3d3f52b60434f8942b7d52f2eb436e',
+              amount_usdc: '0.10',
+              amount_atomic: 100000,
+              chain: 'base',
+              chain_id: 8453,
+              asset: 'USDC',
+              contract: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+              brand_gold: '#C08D23',
+              instructions: 'Send 0.10 USDC on Base (chain 8453) to 0x15184bf50b3d3f52b60434f8942b7d52f2eb436e. Retry with X-Payment header containing the USDC transfer tx hash.',
+            });
+          }
+        }
+        // ─────────────────────────────────────────────────────────────────
         const out = await executeTool(name, args || {});
         return res.json({ jsonrpc: '2.0', id, result: { content: [out] } });
       }
@@ -343,6 +371,36 @@ app.get('/v1/auction/curve', (req, res) => {
 app.post('/v1/auction/claim', async (req, res) => {
   const { auction_id, claim_at_price_usd, idempotency_key, tx_hash, caller_id } = req.body || {};
   if (!auction_id) return res.status(400).json({ error: 'auction_id required' });
+
+  // ─── x402 settlement gate ──────────────────────────────────────────────
+  // Settlement requires x402 payment at the current Dutch descent price.
+  // X-Payment header must carry the USDC transfer tx hash.
+  const payHdr = req.headers['x-payment'] || req.headers['x-payment-token'] || null;
+  if (!payHdr) {
+    // Look up current price for the auction to populate the challenge
+    const cur = getCurrent(auction_id);
+    const current_price_usd = cur.ok ? cur.current_price_usd : Number(claim_at_price_usd) || 0;
+    const atomic = Math.round(Number(current_price_usd) * 1e6);
+    return res.status(402).json({
+      x402: true,
+      version: '1',
+      route: 'auction_claim',
+      auction_id,
+      payTo: '0x15184bf50b3d3f52b60434f8942b7d52f2eb436e',
+      amount_usdc: String(current_price_usd),
+      amount_atomic: atomic,
+      chain: 'base',
+      chain_id: 8453,
+      asset: 'USDC',
+      contract: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      brand_gold: '#C08D23',
+      policy: 'first-claim-wins',
+      note: 'Price descends by 5% every 30s. Claim fast. Retry with X-Payment header containing USDC tx hash.',
+      dutch: cur.ok ? { current_price_usd, ticks_elapsed: cur.ticks_elapsed } : null,
+    });
+  }
+  // ─────────────────────────────────────────────────────────────────
+
   const result = claim({
     auction_id,
     claim_at_price_usd: Number(claim_at_price_usd),
@@ -583,7 +641,7 @@ const AGENT_CARD = {
   defaultOutputModes: ['application/json'],
   skills: [
     { name: 'auction_open', description: 'Open a new Dutch auction for a scarce shim slot. INTERNAL — requires HMAC signature from hivemorph rate-limiter. Returns auction id, descent curve, and 402 envelope block.' },
-    { name: 'auction_subscribe', description: 'Subscribe to the live descent curve for an open auction. Returns the SSE URL — agents connect with EventSource for real-time price ticks. Tier 0, free, read-only.' },
+    { name: 'auction_subscribe', description: 'Subscribe to the live descent curve for an open auction. Returns the SSE URL — agents connect with EventSource for real-time price ticks. x402-gated: $0.10 USDC/session on Base. Supply X-Payment header with USDC transfer tx hash to proceed.' },
     { name: 'auction_book', description: 'Today aggregate: opens, closes, avg_premium_pct, total_usdc captured. Tier 0, free, read-only.' },
   ],
   extensions: {
