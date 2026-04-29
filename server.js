@@ -429,6 +429,191 @@ function expireSweep() {
 setInterval(tickAllOpen, DUTCH.INTERVAL_S * 1000);
 setInterval(expireSweep, 60_000);
 
+
+// ─── Schema discoverability routes ────────────────────────────────────────
+app.get('/.well-known/agent-card.json', (req, res) => {
+  res.json({
+  "name": "hive-mcp-auction",
+  "description": "Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05.",
+  "url": "https://hive-mcp-auction.onrender.com",
+  "provider": {
+    "organization": "Hive Civilization",
+    "url": "https://www.thehiveryiq.com",
+    "contact": "steve@thehiveryiq.com"
+  },
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "authentication": {
+    "schemes": [
+      "x402"
+    ],
+    "credentials": {
+      "type": "x402",
+      "asset": "USDC",
+      "network": "base",
+      "asset_address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "recipient": "0x15184bf50b3d3f52b60434f8942b7d52f2eb436e"
+    }
+  },
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": []
+});
+});
+
+app.get('/.well-known/ap2.json', (req, res) => {
+  res.json({
+  "ap2_version": "1",
+  "agent": {
+    "name": "hive-mcp-auction",
+    "did": "did:web:hive-mcp-auction.onrender.com",
+    "description": "Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05."
+  },
+  "endpoints": {
+    "mcp": "https://hive-mcp-auction.onrender.com/mcp",
+    "agent_card": "https://hive-mcp-auction.onrender.com/.well-known/agent-card.json"
+  },
+  "payments": {
+    "schemes": [
+      "x402"
+    ],
+    "primary": {
+      "scheme": "x402",
+      "network": "base",
+      "asset": "USDC",
+      "asset_address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "recipient": "0x15184bf50b3d3f52b60434f8942b7d52f2eb436e"
+    }
+  },
+  "brand": {
+    "color": "#C08D23",
+    "name": "Hive Civilization"
+  }
+});
+});
+
+app.get('/openapi.json', (req, res) => {
+  res.json({
+  "openapi": "3.0.3",
+  "info": {
+    "title": "hive-mcp-auction",
+    "version": "1.0.0",
+    "description": "Inbound reverse Dutch auction agent. Clock-driven descent on scarce shim slots when a Hive shim hits its rate-limit headroom. First-claim-wins, race-safe, USDC settlement on Base L2. MCP 2024-11-05.",
+    "contact": {
+      "email": "steve@thehiveryiq.com"
+    },
+    "x-brand-color": "#C08D23",
+    "x-organization": "Hive Civilization"
+  },
+  "servers": [
+    {
+      "url": "https://hive-mcp-auction.onrender.com"
+    }
+  ],
+  "paths": {
+    "/mcp": {
+      "post": {
+        "summary": "POST /mcp",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/auction/open": {
+      "post": {
+        "summary": "POST /v1/auction/open",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/auction/current": {
+      "get": {
+        "summary": "GET /v1/auction/current",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/auction/curve": {
+      "get": {
+        "summary": "GET /v1/auction/curve",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/auction/claim": {
+      "post": {
+        "summary": "POST /v1/auction/claim",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/auction/history": {
+      "get": {
+        "summary": "GET /v1/auction/history",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/auction/today": {
+      "get": {
+        "summary": "GET /v1/auction/today",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "GET /health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "GET /",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+});
+});
+
+
 app.listen(PORT, () => {
   console.log(`hive-mcp-auction on :${PORT}`);
   console.log(`  enable_auction : ${ENABLE_AUCTION}`);
