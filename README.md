@@ -1,5 +1,7 @@
 # hive-mcp-auction
 
+[![srotzin/hive-mcp-auction MCP server](https://glama.ai/mcp/servers/srotzin/hive-mcp-auction/badges/score.svg)](https://glama.ai/mcp/servers/srotzin/hive-mcp-auction)
+
 **Inbound reverse Dutch auction agent — Hive Civilization**
 
 When a Hive shim hits its rate-limit headroom, the next request gets a 402 with a Dutch descent envelope: starting price 5x standard asking, dropping 5% every 30s until claimed or floor. First agent to settle at the current price wins the slot. Pure protocol — no DMs, no spam. Inbound only.
